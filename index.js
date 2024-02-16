@@ -18,9 +18,9 @@ const openai = new OpenAI({
 
 
 
+const feeMessage = "🔒 To unlock the feature of sending questions that are on images you have to pay a monthly fee of R30 to CapitecAccount: 2054670215 and use your Telegram number as reference.💰✨";
 
-
-
+const vnMessage = "🔒 To unlock the feature of sending questions that are on voice notes you have to pay a monthly fee of R30 to CapitecAccount: 2054670215 and use your Telegram number as reference.💰✨";
 const greetings = [
     'Hi!',
     'Hello!',
@@ -172,6 +172,14 @@ bot.on('message', async (msg) => {
     const messageText = msg.text;
 
     try {
+        if (msg.photo) {
+           
+            bot.sendMessage(chatId, feeMessage);
+        }
+        if (msg.audio) {
+           
+            bot.sendMessage(chatId, vnMessage);
+        }
         if (messageText && isGreeting(messageText)) {
             sendRandomResponse(chatId, greetings);
         } 
