@@ -13,7 +13,7 @@ const token = process.env.BOT_TOKEN || '6536923050:AAHxQWdwv77zS2kslIDVhv3HbwA5x
 const bot = new TelegramBot(token);
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || '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',
+    apiKey: process.env.OPENAI_API_KEY || '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',
 });
 
 
