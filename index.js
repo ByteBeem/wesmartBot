@@ -52,6 +52,10 @@ function isGreeting(message) {
     return ['hi', 'hello', 'hey' , 'how are you' ].includes(message.toLowerCase());
 }
 
+function sendRandomResponse(chatId, responses) {
+    const randomIndex = Math.floor(Math.random() * responses.length);
+    bot.sendMessage(chatId, responses[randomIndex]);
+}
 
 
 const textbooks = {
