@@ -1,13 +1,22 @@
-const TelegramBot=require('node-telegram-bot-api');
-const bot =new TelegramBot('6536923050:AAHxQWdwv77zS2kslIDVhv3HbwA5x5GfwJ4' , {polling:true});
+const TelegramBot = require('node-telegram-bot-api');
+const express = require('express');
+const bodyParser = require('body-parser');
 const googleTTS = require('google-tts-api');
 const OpenAI = require('openai');
 
+const app = express();
 
+// Set up body parser middleware
+app.use(bodyParser.json());
+
+const token = process.env.BOT_TOKEN || '6536923050:AAHxQWdwv77zS2kslIDVhv3HbwA5x5GfwJ4';
+const bot = new TelegramBot(token);
 
 const openai = new OpenAI({
-    apiKey: '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'
+    apiKey: process.env.OPENAI_API_KEY || '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',
 });
+
+
 
 
 
@@ -195,7 +204,19 @@ bot.onText(/\/start/, (msg) => {
     bot.sendMessage(chatId, "i have been waiting for you😊 \n Ask any questions here \n Request for books to help you study \n Have a normal conversation with Your friend Andries .");
 });
 
-// Error handling
+
+
+app.post(`/bot${token}`, (req, res) => {
+    bot.processUpdate(req.body);
+    res.sendStatus(200);
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Express server is listening on port ${port}`);
+});
+
+
 bot.on('polling_error', (error) => {
     console.error('Polling error:', error);
 });
