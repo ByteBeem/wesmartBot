@@ -1,0 +1,27 @@
+{
+  "name": "wesmartbot",
+  "version": "1.0.0",
+  "description": "telegram bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bytebeem/wesmartBot.git"
+  },
+  "keywords": [
+    "bot"
+  ],
+  "author": "donald mxolisi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bytebeem/wesmartBot/issues"
+  },
+  "homepage": "https://github.com/bytebeem/wesmartBot#readme",
+  "dependencies": {
+    "google-tts-api": "^2.0.2",
+    "node-telegram-bot-api": "^0.64.0",
+    "openai": "^4.28.0"
+  }
+}
