@@ -212,7 +212,7 @@ bot.on('message', async (msg) => {
 
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
-    bot.sendMessage(chatId, "i have been waiting for you😊 \n Ask any questions here \n Request for books to help you study \n Have a normal conversation with Your friend Andries .");
+    bot.sendMessage(chatId, "i have been waiting for you😊");
 });
 
 
