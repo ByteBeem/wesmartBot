@@ -49,7 +49,7 @@ const greetings = [
 
 
 function isGreeting(message) {
-    return ['hi', 'hello', 'hey'].includes(message.toLowerCase());
+    return ['hi', 'hello', 'hey' , 'how are you' ].includes(message.toLowerCase());
 }
 
 
