@@ -13,7 +13,7 @@ const token = process.env.BOT_TOKEN || '6536923050:AAHxQWdwv77zS2kslIDVhv3HbwA5x
 const bot = new TelegramBot(token);
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || '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',
+    apiKey:  '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',
 });
 
 
@@ -30,8 +30,7 @@ const greetings = [
     'Good day!',
     
     'Hey!',
-    'Fede!',
-    'Hiya!',
+   
     'Well, hello!',
     'Hey, what\'s up?',
     'Hola!',
@@ -41,7 +40,7 @@ const greetings = [
     
     'How\'s it going?',
     'Hey, nice to meet you!',
-    'Ahoy there!',
+
     'Sup?'
 ];
 
