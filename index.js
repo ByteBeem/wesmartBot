@@ -4,7 +4,10 @@ const googleTTS = require('google-tts-api');
 const OpenAI = require('openai');
 
 
-const openai = new OpenAI('YOUR_OPENAI_API_KEY');
+
+const openai = new OpenAI({
+    apiKey: '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'
+});
 
 
 
@@ -33,16 +36,7 @@ const greetings = [
     'Sup?'
 ];
 
-const questions = {
-    'How are you?': 'I\'m doing well, thank you! 😊',
-    'What time is it?': new Date().toLocaleTimeString(),
-    'What is your name?': 'I\'m a friendly guy called Andries!',
-    'How old are you?': 'I don\'t have an age, I\'m here to assist you!',
-    'Where are you from?': 'I exist in the digital realm, but I\'m here to help users from all over!',
-    'Do you like pizza?': 'I don\'t have taste buds, but many humans seem to enjoy pizza!',
-    'What is the meaning of life?': 'That\'s a philosophical question! It\'s different for everyone.',
-    'Tell me a joke.': 'Why couldn\'t the bicycle stand up by itself? It was two-tired!'
-};
+
 
 
 function isGreeting(message) {
@@ -50,37 +44,115 @@ function isGreeting(message) {
 }
 
 
-function isQuestion(message) {
-    return Object.keys(questions).includes(message);
+
+const textbooks = {
+    "SMTH011": {
+        
+        pdfUrl: "https://firebasestorage.googleapis.com/v0/b/wesmart-a981c.appspot.com/o/Test_1_SMTH011.pdf?alt=media&token=f413a97b-428e-42e3-b2bc-5576acceabca",
+    },
+    "SCSC011": {
+        name: "Artificial Intelligence: A Modern Approach",
+        author: "Stuart Russell, Peter Norvig",
+        publicationYear: 2021,
+        
+    },
+   
+};
+
+
+function containsModuleNames(text) {
+    const moduleNames = ['SMTH011', 'SCSC011', 'SAPMO11', 'SSTS011']; 
+    const regex = new RegExp(`\\b(${moduleNames.join('|')})\\b`, 'gi'); 
+    console.log(regex.test(text));
+    return regex.test(text);
 }
 
 
-function sendRandomResponse(chatId, responses) {
-    const randomIndex = Math.floor(Math.random() * responses.length);
-    bot.sendMessage(chatId, responses[randomIndex]);
-}
 
+function respondWithTextbookInfo(chatId, moduleName) {
+    const textbook = textbooks[moduleName];
+    if (textbook && textbook.pdfUrl) {
+        // Send textbook information
+        const message ='let me check....'
+        bot.sendMessage(chatId, message);
 
-function answerQuestion(chatId, question) {
-    const response = questions[question];
-    bot.sendMessage(chatId, response);
-}
-
-async function sendJokeAsVoiceNote(chatId) {
-    try {
-        const jokeText = 'Why couldn\'t the bicycle stand up by itself? It was two-tired!';
-        const jokeVoiceNoteUrl = await googleTTS.getAudioUrl(jokeText, {
-            lang: 'en-US',
-            slow: false,
-            host: 'https://translate.google.com',
-            gender: 'male' 
-        });
-        bot.sendVoice(chatId, jokeVoiceNoteUrl);
-    } catch (error) {
-        console.error('Error generating voice note:', error);
-        bot.sendMessage(chatId, 'Sorry, I couldn\'t generate the joke voice note.');
+        
+        bot.sendDocument(chatId, textbook.pdfUrl, { caption: `PDF document for ${moduleName}` })
+            .then(() => {
+                console.log('PDF document sent successfully');
+            })
+            .catch((error) => {
+                console.error('Error sending PDF document:', error);
+            });
+    } else {
+        bot.sendMessage(chatId, 'Textbook information not found for the specified module.');
     }
 }
+
+
+
+async function sendVoiceNotes(chatId, text) {
+    try {
+         {
+            const VoiceNoteUrl = googleTTS.getAudioUrl(text, {
+                lang: 'en',
+                slow: false,
+                host: 'https://translate.google.com',
+                gender: 'male' 
+            });
+            console.log(VoiceNoteUrl);
+            await bot.sendVoice(chatId, VoiceNoteUrl);
+        }
+    } catch (error) {
+        console.error('Error generating voice notes:', error);
+        bot.sendMessage(chatId, 'Sorry.');
+    }
+}
+
+
+
+async function main(userMessage) {
+    try {
+        
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo', 
+            messages: [{ role: "user", content: userMessage }],
+            stream: true,
+        });
+        
+       
+        let output = '';
+        for await (const chunk of response) {
+            output += chunk.choices[0]?.delta?.content || "";
+           
+        }
+
+        
+        return output;
+    } catch (error) {
+        console.error('Error:', error);
+        return 'Sorry, I encountered an error.';
+    }
+}
+
+function chooseOptions(chatId) {
+    const moduleNames = ['SMTH011', 'SCSC011', 'SAPMO11', 'SSTS011']; 
+    const options = moduleNames.map((moduleName, index) => [{ text: moduleName, callback_data: moduleName }]);
+    const keyboardMarkup = {
+        inline_keyboard: options
+    };
+    bot.sendMessage(chatId, 'Please choose a module:', { reply_markup: keyboardMarkup });
+}
+
+
+
+bot.on('callback_query', (callbackQuery) => {
+    const chatId = callbackQuery.message.chat.id;
+    const chosenModuleName = callbackQuery.data;
+   
+    respondWithTextbookInfo(chatId, [chosenModuleName]);
+});
+
 
 
 bot.on('message', async (msg) => {
@@ -90,22 +162,23 @@ bot.on('message', async (msg) => {
     try {
         if (messageText && isGreeting(messageText)) {
             sendRandomResponse(chatId, greetings);
-        } else if (messageText && isQuestion(messageText)) {
-            answerQuestion(chatId, messageText);
-        } else if (messageText.toLowerCase().includes('tell me a joke')) {
-            sendJokeAsVoiceNote(chatId);
-        } else {
-            // Use OpenAI to generate response
-            const response = await openai.complete({
-                engine: 'davinci', 
-                prompt: messageText, 
-                maxTokens: 50, 
-                temperature: 0.7,
-                stop: '\n', 
-            });
-
-            bot.sendMessage(chatId, response.data.choices[0].text.trim());
+        } 
+        else if (messageText === '/start'){
+            bot.sendMessage(chatId, 'Hello');
         }
+        
+        else if (containsModuleNames(messageText)) {
+            chooseOptions(chatId); 
+            
+        
+        } else {
+           
+            const response = await main(messageText);
+           
+            bot.sendMessage(chatId, response);
+            }
+        
+       
     } catch (error) {
         console.error('Error:', error);
         bot.sendMessage(chatId, 'Sorry, I encountered an error.');
@@ -114,77 +187,13 @@ bot.on('message', async (msg) => {
 
 
 
-bot.onText(/\/help/, (msg) => {
-    const chatId = msg.chat.id;
-    const helpMessage = `
-    Welcome to Andries, your smart CS bot!\n
-    You can ask me for help with the following modules:
-    - Calculus and Differentiation: /SMTH011
-    - Computer Science: /SCSC011
-    - Applied Mathematics: /SAPMO11
-    - Logic and Organization: /Shell011
-    - Statistics: /SSTS011
-    `;
-    bot.sendMessage(chatId, helpMessage);
-});
 
-// Command for SMTH011 (Calculus and Differentiation)
-bot.onText(/\/SMTH011/, (msg) => {
-    const chatId = msg.chat.id;
-    const response = `
-    SMTH011 - Calculus and Differentiation\n
-    - Overview of calculus concepts
-    - Differentiation techniques
-    - Practice problems and solutions
-    `;
-    bot.sendMessage(chatId, response);
-});
 
-// Command for SCSC011 (Computer Science)
-bot.onText(/\/SCSC011/, (msg) => {
-    const chatId = msg.chat.id;
-    const response = `
-    SCSC011 - Computer Science\n
-    - Introduction to programming languages
-    - Data structures and algorithms
-    - Computer architecture basics
-    `;
-    bot.sendMessage(chatId, response);
-});
 
-// Command for SAPMO11 (Applied Mathematics)
-bot.onText(/\/SAPMO11/, (msg) => {
+bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
-    const response = `
-    SAPMO11 - Applied Mathematics\n
-    - Application of mathematical concepts in real-world scenarios
-    - Case studies and examples
-    `;
-    bot.sendMessage(chatId, response);
+    bot.sendMessage(chatId, "i have been waiting for you😊 \n Ask any questions here \n Request for books to help you study \n Have a normal conversation with Your friend Andries .");
 });
-
-// Command for Shell011 (Logic and Organization)
-bot.onText(/\/Shell011/, (msg) => {
-    const chatId = msg.chat.id;
-    const response = `
-    Shell011 - Logic and Organization\n
-    - Introduction to logical thinking
-    - Organizational strategies and techniques
-    `;
-    bot.sendMessage(chatId, response);
-});
-
-// Command for SSTS011 (Statistics)
-bot.onText(/\/SSTS011/, (msg) => {
-    const chatId = msg.chat.id;
-    const response = `
-    SSTS011 - Statistics\n
-    - Statistical analysis methods
-    - Probability theory
-    `;
-    bot.sendMessage(chatId, response);
-});
-
 
 // Error handling
 bot.on('polling_error', (error) => {
