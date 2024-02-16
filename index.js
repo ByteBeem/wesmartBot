@@ -176,11 +176,11 @@ bot.on('message', async (msg) => {
            
             bot.sendMessage(chatId, feeMessage);
         }
-        if (msg.audio) {
+       else  if (msg.audio) {
            
             bot.sendMessage(chatId, vnMessage);
         }
-        if (messageText && isGreeting(messageText)) {
+        else if (messageText && isGreeting(messageText)) {
             sendRandomResponse(chatId, greetings);
         } 
         else if (messageText === '/start'){
