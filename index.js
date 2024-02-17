@@ -129,7 +129,7 @@ async function main(userMessage) {
     try {
         
         const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo-instruct-0914', 
+            model: 'davinci-002', 
             messages: [{ role: "user", content: userMessage }],
             stream: true,
         });
