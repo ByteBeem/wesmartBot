@@ -132,7 +132,7 @@ async function main(userMessage) {
             prompt: userMessage,
             max_tokens: 150,
         });
-        
+        console.log(response)
         return response.data.choices[0]?.text || '';
     } catch (error) {
         console.error('Error:', error);
