@@ -145,7 +145,7 @@ async function main(userMessage) {
         return output;
     } catch (error) {
         console.error('Error:', error);
-        return 'Sorry, I encountered an error.';
+        return 'Sorry! Im getting lot of requests right now , try again in 10min.';
     }
 }
 
