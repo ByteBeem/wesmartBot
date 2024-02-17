@@ -24,6 +24,7 @@
     "express": "^4.18.2",
     "google-tts-api": "^2.0.2",
     "node-telegram-bot-api": "^0.64.0",
-    "openai": "^4.28.0"
+    "openai": "^4.28.0",
+    "tesseract.js": "^5.0.4"
   }
 }
