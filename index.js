@@ -3,16 +3,21 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const googleTTS = require('google-tts-api');
 const OpenAI = require('openai');
-const createWorker  = require('tesseract.js');
+const { createWorker } = require('tesseract.js');
 
-const worker = createWorker();
-const app = express();
+const worker = await createWorker('eng', 1, {
+  logger: m => console.log(m), 
+});
 
 (async () => {
-    await worker.load();
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
+  const { data: { text } } = await worker.recognize('https://tesseract.projectnaptha.com/img/eng_bw.png');
+  console.log(text);
+  await worker.terminate();
 })();
+
+const app = express();
+
+
 app.use(bodyParser.json());
 
 const token = process.env.BOT_TOKEN || '6536923050:AAHxQWdwv77zS2kslIDVhv3HbwA5x5GfwJ4';
