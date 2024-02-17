@@ -5,16 +5,7 @@ const googleTTS = require('google-tts-api');
 const OpenAI = require('openai');
 const { createWorker } = require('tesseract.js');
 
-
 const worker = createWorker();
-
-(async () => {
-    await worker.load();
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
-})();
-
-
 const app = express();
 
 // Set up body parser middleware
@@ -90,24 +81,6 @@ function containsModuleNames(text) {
     return regex.test(text);
 }
 
-async function extractImage(ctx) {
-    try {
-        const photo = ctx.message.photo[ctx.message.photo.length - 1];
-        const photoUrl = await ctx.telegram.getFileLink(photo.file_id);
-        
-        const { data: { text } } = await worker.recognize(photoUrl);
-        
-        console.log("img data ",text );
-        //const response = await main(text);
-        
-        
-        //ctx.reply(response);
-    } catch (error) {
-        console.error('Error extracting text from image:', error);
-        ctx.reply('Sorry, I encountered an error processing the image.');
-    }
-}
-    
 
 
 function respondWithTextbookInfo(chatId, moduleName) {
@@ -202,7 +175,7 @@ bot.on('message', async (msg) => {
 
     try {
         if (msg.photo) {
-            await extractImage(msg);
+           
             bot.sendMessage(chatId, feeMessage);
         }
        else  if (msg.audio) {
