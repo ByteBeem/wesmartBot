@@ -8,7 +8,11 @@ const { createWorker } = require('tesseract.js');
 const worker = createWorker();
 const app = express();
 
-// Set up body parser middleware
+(async () => {
+    
+    await worker.loadLanguage('eng');
+    await worker.initialize('eng');
+})();
 app.use(bodyParser.json());
 
 const token = process.env.BOT_TOKEN || '6536923050:AAHxQWdwv77zS2kslIDVhv3HbwA5x5GfwJ4';
@@ -103,6 +107,25 @@ function respondWithTextbookInfo(chatId, moduleName) {
     }
 }
 
+async function extractImage(ctx) {
+    try {
+        const photo = ctx.message.photo[ctx.message.photo.length - 1];
+        const photoUrl = await ctx.telegram.getFileLink(photo.file_id);
+        
+        const { data: { text } } = await worker.recognize(photoUrl);
+
+        console.log("img data ", text)
+        
+        // Process the extracted text
+       // const response = await main(text);
+        
+        // Send the response back to the user
+       // ctx.reply(response);
+    } catch (error) {
+        console.error('Error extracting text from image:', error);
+        ctx.reply('Sorry, I encountered an error processing the image.');
+    }
+}
 
 
 async function sendVoiceNotes(chatId, text) {
@@ -175,7 +198,7 @@ bot.on('message', async (msg) => {
 
     try {
         if (msg.photo) {
-           
+           await extractImage(msg.photo);
             bot.sendMessage(chatId, feeMessage);
         }
        else  if (msg.audio) {
