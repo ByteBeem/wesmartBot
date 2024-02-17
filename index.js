@@ -9,7 +9,7 @@ const worker = createWorker();
 const app = express();
 
 (async () => {
-    await worker.load():
+    await worker.load();
     await worker.loadLanguage('eng');
     await worker.initialize('eng');
 })();
