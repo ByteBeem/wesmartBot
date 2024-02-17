@@ -91,8 +91,8 @@ async function extractImage(ctx) {
         console.log("img data ",text );
         //const response = await main(text);
         
-        // Send the response back to the user
-        ctx.reply(response);
+        
+        //ctx.reply(response);
     } catch (error) {
         console.error('Error extracting text from image:', error);
         ctx.reply('Sorry, I encountered an error processing the image.');
