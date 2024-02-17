@@ -6,6 +6,12 @@ const OpenAI = require('openai');
 const { createWorker } = require('tesseract.js');
 
 const worker = createWorker();
+(async () => {
+    await worker.load();
+    await worker.loadLanguage('eng');
+    await worker.initialize('eng');
+})();
+
 const app = express();
 
 // Set up body parser middleware
@@ -252,8 +258,3 @@ bot.on('polling_error', (error) => {
     console.error('Polling error:', error);
 });
 
-(async () => {
-    await worker.load();
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
-})();
