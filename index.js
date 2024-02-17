@@ -5,7 +5,7 @@ const googleTTS = require('google-tts-api');
 const OpenAI = require('openai');
 const { createWorker } = require('tesseract.js');
 
-const worker = await createWorker('eng', 1, {
+const worker =async () =>  await createWorker('eng', 1, {
   logger: m => console.log(m), 
 });
 
