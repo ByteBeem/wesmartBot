@@ -5,15 +5,7 @@ const googleTTS = require('google-tts-api');
 const OpenAI = require('openai');
 const { createWorker } = require('tesseract.js');
 
-const worker =async () =>  await createWorker('eng', 1, {
-  logger: m => console.log(m), 
-});
 
-(async () => {
-  const { data: { text } } = await worker.recognize('https://tesseract.projectnaptha.com/img/eng_bw.png');
-  console.log(text);
-  await worker.terminate();
-})();
 
 const app = express();
 
@@ -203,7 +195,7 @@ bot.on('message', async (msg) => {
 
     try {
         if (msg.photo) {
-           await extractImage(msg.photo);
+          
             bot.sendMessage(chatId, feeMessage);
         }
        else  if (msg.audio) {
