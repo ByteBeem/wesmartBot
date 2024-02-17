@@ -3,13 +3,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const googleTTS = require('google-tts-api');
 const OpenAI = require('openai');
-const { createWorker } = require('tesseract.js');
+const createWorker  = require('tesseract.js');
 
 const worker = createWorker();
 const app = express();
 
 (async () => {
-    
+    await worker.load():
     await worker.loadLanguage('eng');
     await worker.initialize('eng');
 })();
