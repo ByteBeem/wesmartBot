@@ -127,19 +127,27 @@ async function sendVoiceNotes(chatId, text) {
 
 async function main(userMessage) {
     try {
-        const response = await openai.completions.create({
-            model: 'davinci-002', 
-            prompt: userMessage,
-            max_tokens: 150,
+        
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo', 
+            messages: [{ role: "user", content: userMessage }],
+            stream: true,
         });
-        console.log(response)
-        return response.data.choices[0]?.text || '';
+        
+       
+        let output = '';
+        for await (const chunk of response) {
+            output += chunk.choices[0]?.delta?.content || "";
+           
+        }
+
+        
+        return output;
     } catch (error) {
         console.error('Error:', error);
         return 'Sorry, I encountered an error.';
     }
 }
-
 
 function chooseOptions(chatId) {
     const moduleNames = ['SMTH011', 'SCSC011', 'SAPMO11', 'SSTS011']; 
@@ -225,4 +233,3 @@ app.listen(port, () => {
 bot.on('polling_error', (error) => {
     console.error('Polling error:', error);
 });
-
